@@ -578,8 +578,9 @@ function toggleFaq(el) {
 
 // Email submit
 async function submitEmail() {
-  const SUPABASE_URL = 'YOUR_SUPABASE_URL'
-  const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY'
+  const SUPABASE_URL = 'https://rgnzrnavnaxcldnibxjj.supabase.co'
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'
+
 
   const email = document.getElementById('email-input').value.trim()
   if (!email || !email.includes('@')) return
