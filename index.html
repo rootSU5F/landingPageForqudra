@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>قُدراتي — ذاكر بذكاء</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#070c13;--surface:#0c1520;--card:#101d2e;--border:#162640;
+  --accent:#0ed2a8;--accentD:#09a882;--accentXL:#80ffe8;
+  --white:#eaf6f2;--gray:#7a9eb5;--grayD:#3d607a;
+  --amber:#f6a035;--coral:#f04f6a;--purple:#8b5cf6;--cyan:#38d1f5;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--white);font-family:'Tajawal',sans-serif;overflow-x:hidden;line-height:1.65;}
+
+/* Noise */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.4;}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--accentD);border-radius:2px;}
+
+/* Grid bg */
+.grid-bg{position:fixed;inset:0;background-image:linear-gradient(rgba(14,210,168,0.035) 1px,transparent 1px),linear-gradient(90deg,rgba(14,210,168,0.035) 1px,transparent 1px);background-size:55px 55px;animation:gridDrift 30s linear infinite;pointer-events:none;z-index:0;}
+@keyframes gridDrift{0%{transform:translateY(0)}100%{transform:translateY(55px)}}
+
+/* Orbs */
+.orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;}
+.orb1{width:600px;height:600px;background:rgba(14,210,168,0.055);top:-200px;right:-150px;animation:orbFloat 12s ease-in-out infinite;}
+.orb2{width:500px;height:500px;background:rgba(139,92,246,0.04);bottom:-100px;left:-150px;animation:orbFloat 16s ease-in-out infinite reverse;}
+.orb3{width:300px;height:300px;background:rgba(240,79,106,0.03);top:50%;left:50%;animation:orbFloat 20s ease-in-out infinite 5s;}
+@keyframes orbFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-30px) scale(1.05)}}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(7,12,19,0.88);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);height:60px;padding:0 2.5rem;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-family:'Space Mono',monospace;font-weight:700;font-size:0.9rem;color:var(--white);letter-spacing:0.04em;}
+.nav-logo span{color:var(--accent);}
+.nav-links{display:flex;gap:0.25rem;list-style:none;}
+.nav-links a{font-family:'Space Mono',monospace;font-size:0.62rem;color:var(--grayD);text-decoration:none;padding:0.3rem 0.65rem;border-radius:4px;transition:all 0.2s;white-space:nowrap;}
+.nav-links a:hover{color:var(--accent);background:rgba(14,210,168,0.07);}
+.nav-cta{font-family:'Space Mono',monospace;font-size:0.65rem;padding:0.4rem 1rem;background:var(--accent);color:#070c13;border:none;border-radius:4px;cursor:pointer;font-weight:700;transition:background 0.2s;}
+.nav-cta:hover{background:var(--accentD);}
+
+/* SECTIONS */
+section{position:relative;z-index:1;padding:6rem 2.5rem;max-width:1100px;margin:0 auto;}
+section+section{padding-top:4rem;}
+
+/* Labels */
+.label{font-family:'Space Mono',monospace;font-size:0.62rem;letter-spacing:0.18em;color:var(--accent);text-transform:uppercase;margin-bottom:1.1rem;display:flex;align-items:center;gap:0.75rem;}
+.label::before{content:'';width:28px;height:1px;background:var(--accent);display:block;}
+
+h2{font-size:clamp(1.9rem,4vw,2.8rem);font-weight:800;line-height:1.1;margin-bottom:0.5rem;letter-spacing:-0.03em;}
+.sub{font-size:1rem;color:var(--gray);margin-bottom:3rem;max-width:58ch;font-weight:300;}
+
+.divider{height:1px;background:linear-gradient(90deg,var(--border),transparent);position:relative;z-index:1;}
+
+/* ── HERO ── */
+#hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding-top:100px;padding-bottom:4rem;max-width:none;position:relative;overflow:hidden;}
+.hero-inner{max-width:1100px;margin:0 auto;width:100%;padding:0 2.5rem;}
+
+/* animated ticker */
+.ticker-wrap{overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:0.6rem 0;margin-bottom:2.5rem;position:relative;}
+.ticker-wrap::before,.ticker-wrap::after{content:'';position:absolute;top:0;bottom:0;width:80px;z-index:2;}
+.ticker-wrap::before{left:0;background:linear-gradient(90deg,var(--bg),transparent);}
+.ticker-wrap::after{right:0;background:linear-gradient(270deg,var(--bg),transparent);}
+.ticker{display:flex;gap:3rem;animation:ticker 20s linear infinite;white-space:nowrap;}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.ticker-item{font-family:'Space Mono',monospace;font-size:0.62rem;color:var(--grayD);display:flex;align-items:center;gap:0.5rem;}
+.ticker-item span{color:var(--accent);}
+
+.hero-eyebrow{font-family:'Space Mono',monospace;font-size:0.68rem;letter-spacing:0.2em;color:var(--accent);text-transform:uppercase;margin-bottom:1.5rem;display:flex;align-items:center;gap:1rem;animation:fadeUp 0.8s ease both;}
+.hero-eyebrow span{display:inline-block;width:40px;height:1px;background:var(--accent);}
+h1.hero-title{font-size:clamp(3.5rem,9vw,7.5rem);letter-spacing:-0.045em;line-height:0.93;margin-bottom:0.35em;animation:fadeUp 0.8s 0.1s ease both;font-weight:900;}
+h1.hero-title .accent{color:var(--accent);}
+h1.hero-title .dim{color:var(--grayD);}
+.hero-desc{font-size:1.15rem;color:var(--gray);max-width:50ch;margin-bottom:2.75rem;animation:fadeUp 0.8s 0.2s ease both;line-height:1.75;font-weight:300;}
+.hero-actions{display:flex;gap:1rem;flex-wrap:wrap;animation:fadeUp 0.8s 0.3s ease both;margin-bottom:3.5rem;}
+.btn-primary{padding:1rem 2rem;background:var(--accent);color:#070c13;border:none;border-radius:4px;font-family:'Tajawal',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:background 0.2s,transform 0.15s;text-decoration:none;display:inline-block;}
+.btn-primary:hover{background:var(--accentD);transform:translateY(-2px);}
+.btn-secondary{padding:1rem 2rem;background:transparent;color:var(--gray);border:1px solid var(--border);border-radius:4px;font-family:'Tajawal',sans-serif;font-size:1rem;cursor:pointer;transition:all 0.2s;text-decoration:none;display:inline-block;}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent);}
+.hero-stats{display:flex;gap:3.5rem;flex-wrap:wrap;animation:fadeUp 0.8s 0.4s ease both;}
+.hero-stat .val{font-family:'Space Mono',monospace;font-size:2.4rem;font-weight:700;color:var(--accent);line-height:1;letter-spacing:-0.04em;}
+.hero-stat .lbl{font-size:0.82rem;color:var(--grayD);margin-top:0.25rem;}
+
+.hero-scroll{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:0.4rem;font-family:'Space Mono',monospace;font-size:0.58rem;color:var(--grayD);animation:floatScroll 2.5s ease-in-out infinite;}
+@keyframes floatScroll{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
+.hero-scroll::after{content:'↓';font-size:1rem;color:var(--accent);}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── PROBLEM ── */
+#problem{padding:5rem 2.5rem;}
+.problem-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:2.5rem;}
+@media(max-width:640px){.problem-grid{grid-template-columns:1fr;}}
+.big-stat{background:var(--card);border:1px solid var(--border);border-right:3px solid var(--coral);padding:2.5rem 2rem;border-radius:4px;grid-row:span 2;}
+.big-stat .num{font-family:'Space Mono',monospace;font-size:5.5rem;font-weight:700;color:var(--coral);line-height:1;letter-spacing:-0.05em;}
+.big-stat .desc{color:var(--gray);font-size:1.05rem;margin-top:0.75rem;line-height:1.65;}
+.big-stat .note{font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--grayD);margin-top:1rem;font-style:italic;}
+.prob-card{background:var(--card);border:1px solid var(--border);border-right:3px solid var(--accent);padding:1.5rem;border-radius:4px;transition:transform 0.2s,border-color 0.2s;}
+.prob-card:hover{transform:translateX(-4px);}
+.prob-card .icon{font-size:1.3rem;margin-bottom:0.6rem;}
+.prob-card h3{font-size:0.95rem;font-weight:700;margin-bottom:0.35rem;}
+.prob-card p{font-size:0.85rem;color:var(--gray);line-height:1.6;}
+
+/* ── FEATURES ── */
+#features{padding:5rem 2.5rem;}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-top:2.5rem;}
+@media(max-width:768px){.feat-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:480px){.feat-grid{grid-template-columns:1fr;}}
+.feat-card{background:var(--card);border:1px solid var(--border);padding:1.75rem 1.5rem;border-radius:4px;position:relative;transition:transform 0.2s;overflow:hidden;}
+.feat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--feat-color,var(--accent));}
+.feat-card:hover{transform:translateY(-5px);}
+.feat-num{font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--feat-color,var(--accent));margin-bottom:0.75rem;}
+.feat-icon{font-size:1.6rem;margin-bottom:0.75rem;}
+.feat-card h3{font-size:1rem;font-weight:700;margin-bottom:0.5rem;}
+.feat-card p{font-size:0.85rem;color:var(--gray);line-height:1.6;}
+
+/* ── DEMO ── */
+#demo{padding:5rem 2.5rem;}
+.demo-wrap{display:grid;grid-template-columns:1fr 1.2fr;gap:3rem;align-items:center;margin-top:2.5rem;}
+@media(max-width:700px){.demo-wrap{grid-template-columns:1fr;}}
+.demo-left h3{font-size:1.2rem;font-weight:700;margin-bottom:0.75rem;}
+.demo-left p{font-size:0.9rem;color:var(--gray);line-height:1.7;margin-bottom:1.25rem;}
+.demo-pill{display:inline-flex;align-items:center;gap:0.5rem;font-family:'Space Mono',monospace;font-size:0.6rem;padding:0.3rem 0.75rem;border:1px solid var(--border);color:var(--gray);border-radius:20px;margin:0.25rem;}
+.demo-pill.active{border-color:var(--accent);color:var(--accent);background:rgba(14,210,168,0.07);}
+
+/* Phone mockup */
+.phone{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:1.5rem;max-width:320px;margin:0 auto;box-shadow:0 32px 80px rgba(0,0,0,0.5);}
+.phone-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;}
+.phone-logo{font-family:'Space Mono',monospace;font-size:0.75rem;font-weight:700;}
+.phone-logo span{color:var(--accent);}
+.phone-streak{display:flex;align-items:center;gap:0.35rem;background:rgba(246,160,53,0.1);border:1px solid rgba(246,160,53,0.3);padding:0.25rem 0.6rem;border-radius:20px;font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--amber);}
+.phone-prog{height:3px;background:var(--border);border-radius:2px;margin-bottom:1.25rem;overflow:hidden;}
+.phone-prog-fill{height:100%;background:var(--accent);width:40%;border-radius:2px;}
+.phone-card{background:#0d1824;border:1px solid var(--border);border-radius:12px;padding:1.25rem;position:relative;}
+.phone-tags{display:flex;justify-content:space-between;margin-bottom:1rem;}
+.phone-tag{font-family:'Space Mono',monospace;font-size:0.55rem;padding:0.15rem 0.5rem;border-radius:20px;}
+.phone-tag.sec{border:1px solid var(--accent);color:var(--accent);}
+.phone-tag.dif{border:1px solid var(--border);color:var(--grayD);}
+.phone-q{font-size:0.95rem;font-weight:500;line-height:1.6;margin-bottom:1.1rem;color:var(--white);}
+.phone-opts{display:flex;flex-direction:column;gap:0.4rem;}
+.phone-opt{display:flex;align-items:center;gap:0.6rem;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:7px;padding:0.6rem 0.8rem;cursor:pointer;transition:all 0.2s;font-size:0.82rem;}
+.phone-opt:hover{border-color:var(--accent);background:rgba(14,210,168,0.05);}
+.phone-opt.correct{border-color:var(--accent);background:rgba(14,210,168,0.08);}
+.phone-opt.wrong{border-color:var(--coral);background:rgba(240,79,106,0.08);}
+.phone-letter{font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--grayD);min-width:16px;text-align:center;}
+.phone-opt.correct .phone-letter{color:var(--accent);}
+.phone-opt.wrong .phone-letter{color:var(--coral);}
+.phone-feedback{position:absolute;inset:0;border-radius:12px;display:none;flex-direction:column;align-items:center;justify-content:center;gap:0.6rem;text-align:center;padding:1.25rem;}
+.phone-feedback.show{display:flex;}
+.phone-feedback.c-fb{background:rgba(14,210,168,0.12);border:1px solid rgba(14,210,168,0.4);}
+.phone-feedback.w-fb{background:rgba(240,79,106,0.12);border:1px solid rgba(240,79,106,0.4);}
+.fb-emoji{font-size:2rem;}
+.fb-title{font-size:1rem;font-weight:700;}
+.c-fb .fb-title{color:var(--accent);}
+.w-fb .fb-title{color:var(--coral);}
+.fb-exp{font-size:0.75rem;color:var(--gray);line-height:1.6;}
+.fb-next{margin-top:0.4rem;padding:0.5rem 1.25rem;background:var(--accent);color:#070c13;border:none;border-radius:5px;font-family:'Tajawal',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;}
+
+/* ── PRICING ── */
+#pricing{padding:5rem 2.5rem;}
+.pricing-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:2.5rem;max-width:700px;}
+@media(max-width:600px){.pricing-grid{grid-template-columns:1fr;}}
+.plan{background:var(--card);border:1px solid var(--border);padding:2rem;border-radius:4px;position:relative;}
+.plan.featured{border-color:var(--accent);background:rgba(14,210,168,0.04);}
+.plan-badge{position:absolute;top:-12px;right:1.5rem;font-family:'Space Mono',monospace;font-size:0.58rem;padding:0.2rem 0.65rem;background:var(--accent);color:#070c13;border-radius:20px;font-weight:700;}
+.plan-name{font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--grayD);letter-spacing:0.1em;margin-bottom:0.75rem;}
+.plan-price{font-family:'Space Mono',monospace;font-size:3rem;font-weight:700;color:var(--white);line-height:1;letter-spacing:-0.04em;}
+.plan-price span{font-size:1rem;color:var(--gray);font-weight:400;}
+.plan.featured .plan-price{color:var(--accent);}
+.plan-desc{font-size:0.85rem;color:var(--gray);margin:0.75rem 0 1.5rem;line-height:1.6;}
+.plan-features{display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1.75rem;}
+.plan-feat{font-size:0.85rem;color:var(--gray);display:flex;align-items:center;gap:0.5rem;}
+.plan-feat.yes{color:var(--white);}
+.plan-feat .check{font-size:0.7rem;color:var(--accent);}
+.plan-feat .cross{font-size:0.7rem;color:var(--grayD);}
+.plan-btn{width:100%;padding:0.9rem;border:1px solid var(--border);background:transparent;color:var(--gray);border-radius:4px;font-family:'Tajawal',sans-serif;font-size:0.95rem;cursor:pointer;transition:all 0.2s;font-weight:500;}
+.plan-btn:hover{border-color:var(--accent);color:var(--accent);}
+.plan.featured .plan-btn{background:var(--accent);color:#070c13;border-color:var(--accent);font-weight:700;}
+.plan.featured .plan-btn:hover{background:var(--accentD);}
+
+/* ── FAQ ── */
+#faq{padding:5rem 2.5rem;}
+.faq-list{display:flex;flex-direction:column;gap:0.75rem;margin-top:2.5rem;max-width:700px;}
+.faq-item{background:var(--card);border:1px solid var(--border);border-radius:4px;overflow:hidden;transition:border-color 0.2s;}
+.faq-item.open{border-color:var(--accent);}
+.faq-q{padding:1.1rem 1.5rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:0.95rem;}
+.faq-q:hover{color:var(--accent);}
+.faq-arrow{font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--grayD);transition:transform 0.3s;}
+.faq-item.open .faq-arrow{transform:rotate(180deg);color:var(--accent);}
+.faq-a{max-height:0;overflow:hidden;transition:max-height 0.35s ease,padding 0.2s;}
+.faq-item.open .faq-a{max-height:200px;padding:0 1.5rem 1.25rem;}
+.faq-a p{font-size:0.88rem;color:var(--gray);line-height:1.7;}
+
+/* ── CTA ── */
+#cta{padding:6rem 2.5rem;text-align:center;}
+.cta-box{background:var(--card);border:1px solid var(--border);border-top:2px solid var(--accent);padding:4rem 3rem;border-radius:4px;max-width:700px;margin:0 auto;}
+.cta-box h2{font-size:clamp(2rem,5vw,3.2rem);margin-bottom:0.75rem;}
+.cta-box p{color:var(--gray);margin-bottom:2.5rem;font-size:1rem;font-weight:300;}
+.email-form{display:flex;gap:0.75rem;max-width:440px;margin:0 auto;flex-wrap:wrap;justify-content:center;}
+.email-input{flex:1;min-width:220px;padding:0.85rem 1.1rem;background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--white);font-family:'Space Mono',monospace;font-size:0.8rem;outline:none;transition:border-color 0.2s;direction:ltr;}
+.email-input:focus{border-color:var(--accent);}
+.email-input::placeholder{color:var(--grayD);}
+.email-btn{padding:0.85rem 1.5rem;background:var(--accent);color:#070c13;border:none;border-radius:4px;font-family:'Tajawal',sans-serif;font-size:0.95rem;font-weight:700;cursor:pointer;transition:background 0.2s;white-space:nowrap;}
+.email-btn:hover{background:var(--accentD);}
+.email-note{font-family:'Space Mono',monospace;font-size:0.58rem;color:var(--grayD);margin-top:1rem;}
+.success-msg{display:none;font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--accent);margin-top:1rem;}
+.success-msg.show{display:block;}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid var(--border);padding:2.5rem;position:relative;z-index:1;}
+.footer-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
+.footer-logo{font-family:'Space Mono',monospace;font-weight:700;font-size:0.85rem;}
+.footer-logo span{color:var(--accent);}
+.footer-note{font-family:'Space Mono',monospace;font-size:0.58rem;color:var(--grayD);}
+.footer-links{display:flex;gap:1.5rem;}
+.footer-links a{font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--grayD);text-decoration:none;transition:color 0.2s;}
+.footer-links a:hover{color:var(--accent);}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">قُدراتي<span>.</span></div>
+  <ul class="nav-links">
+    <li><a href="#problem">المشكلة</a></li>
+    <li><a href="#features">المميزات</a></li>
+    <li><a href="#demo">تجربة</a></li>
+    <li><a href="#pricing">الأسعار</a></li>
+    <li><a href="#faq">أسئلة</a></li>
+  </ul>
+  <button class="nav-cta" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})">انضم الآن</button>
+</nav>
+
+<!-- HERO -->
+<div id="hero" style="position:relative;z-index:1;overflow:hidden;min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding-top:80px;">
+  <!-- Ticker -->
+  <div class="ticker-wrap">
+    <div class="ticker">
+      <span class="ticker-item">⚡ أسئلة قدرات <span>لفظي وكمّي</span></span>
+      <span class="ticker-item">🔥 ستريك يومي <span>يبني العادة</span></span>
+      <span class="ticker-item">🏆 ليدربورد <span>أسبوعي</span></span>
+      <span class="ticker-item">🎯 محرك تكيّفي <span>يصلح ضعفك</span></span>
+      <span class="ticker-item">📱 سوايب <span>مثل تيك توك</span></span>
+      <span class="ticker-item">+1000 <span>سؤال</span></span>
+      <span class="ticker-item">⚡ أسئلة قدرات <span>لفظي وكمّي</span></span>
+      <span class="ticker-item">🔥 ستريك يومي <span>يبني العادة</span></span>
+      <span class="ticker-item">🏆 ليدربورد <span>أسبوعي</span></span>
+      <span class="ticker-item">🎯 محرك تكيّفي <span>يصلح ضعفك</span></span>
+      <span class="ticker-item">📱 سوايب <span>مثل تيك توك</span></span>
+      <span class="ticker-item">+1000 <span>سؤال</span></span>
+    </div>
+  </div>
+
+  <div class="hero-inner">
+    <div class="hero-eyebrow"><span></span>منصة التحضير للقدرات</div>
+    <h1 class="hero-title">
+      ذاكر<br>
+      <span class="accent">بذكاء.</span><br>
+      <span class="dim">مو بصعوبة.</span>
+    </h1>
+    <p class="hero-desc">
+      أسئلة قدرات بأسلوب السوشيال ميديا —
+      سوايب، جاوب، وتطور كل يوم.
+      بدون كتب ممله. بدون PDFs. بس نتائج.
+    </p>
+    <div class="hero-actions">
+      <a href="#cta" class="btn-primary">ابدأ مجاناً ←</a>
+      <a href="#demo" class="btn-secondary">شوف كيف يشتغل</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="val">+1000</div><div class="lbl">سؤال قدرات</div></div>
+      <div class="hero-stat"><div class="val">300K+</div><div class="lbl">طالب يأخذون القدرات سنوياً</div></div>
+      <div class="hero-stat"><div class="val">مجاني</div><div class="lbl">للبدء الآن</div></div>
+    </div>
+  </div>
+
+  <div class="hero-scroll">SCROLL</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- PROBLEM -->
+<section id="problem" style="max-width:1100px;">
+  <div class="label">المشكلة</div>
+  <h2>المذاكرة التقليدية <span style="color:var(--coral)">مكسورة.</span></h2>
+  <p class="sub">الطالب السعودي يعرف إنه يحتاج يذاكر للقدرات — لكن ما يقدر يكمّل.</p>
+  <div class="problem-grid">
+    <div class="big-stat">
+      <div class="num">73%</div>
+      <div class="desc">من الطلاب يبدؤون المذاكرة للقدرات — ويتوقفون قبل ما يكملوا الأسبوع الأول.</div>
+      <div class="note">// المنافس الحقيقي مو الكتاب — هو تيك توك وسناب</div>
+    </div>
+    <div class="prob-card">
+      <div class="icon">😴</div>
+      <h3>الكتب والـ PDFs مملة</h3>
+      <p>المخ يرفض المعلومات لما تكون ممله. السوشيال ميديا فازت على الكتاب منذ زمن.</p>
+    </div>
+    <div class="prob-card" style="border-right-color:var(--amber)">
+      <div class="icon">📱</div>
+      <h3>التطبيقات الحالية مو ممتعة</h3>
+      <p>إتقان وأكاديمية قياس — محتوى كويس بس تجربة تشبه الواجب المدرسي.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- FEATURES -->
+<section id="features" style="max-width:1100px;">
+  <div class="label">الحل</div>
+  <h2>مبني للجيل اللي كبر على <span style="color:var(--accent)">السوشيال ميديا.</span></h2>
+  <p class="sub">كل ميزة مصممة لتحل مشكلة حقيقية يعانيها الطالب المستعد للقدرات.</p>
+  <div class="feat-grid">
+    <div class="feat-card" style="--feat-color:#0ed2a8">
+      <div class="feat-num">01</div>
+      <div class="feat-icon">⚡</div>
+      <h3>سوايب على الأسئلة</h3>
+      <p>تجربة مثل تيك توك — سوايب، جاوب، وانتقل. ما في قوائم ممله أو تصفح معقد.</p>
+    </div>
+    <div class="feat-card" style="--feat-color:#f04f6a">
+      <div class="feat-num">02</div>
+      <div class="feat-icon">🔥</div>
+      <h3>ستريك يومي</h3>
+      <p>يتراكم كل يوم تذاكر فيه. كسر الستريك مؤلم — وهذا بالضبط ما يخليك تكمّل.</p>
+    </div>
+    <div class="feat-card" style="--feat-color:#f6a035">
+      <div class="feat-num">03</div>
+      <div class="feat-icon">🏆</div>
+      <h3>ليدربورد أسبوعي</h3>
+      <p>تنافس مع زملائك. يتجدد كل أسبوع — فرصة جديدة للتصدر كل إثنين.</p>
+    </div>
+    <div class="feat-card" style="--feat-color:#8b5cf6">
+      <div class="feat-num">04</div>
+      <div class="feat-icon">🎯</div>
+      <h3>محرك تكيّفي ذكي</h3>
+      <p>يرصد كل سؤال غلطت فيه ويعطيك أسئلة أكثر من نفس الموضوع — تلقائياً.</p>
+    </div>
+    <div class="feat-card" style="--feat-color:#38d1f5">
+      <div class="feat-num">05</div>
+      <div class="feat-icon">⚡</div>
+      <h3>ردود فعل فورية</h3>
+      <p>بعد كل سؤال تعرف الجواب على طول مع شرح مبسّط. ما في انتظار.</p>
+    </div>
+    <div class="feat-card" style="--feat-color:#f6a035">
+      <div class="feat-num">06</div>
+      <div class="feat-icon">📊</div>
+      <h3>تتبع نقاط الضعف</h3>
+      <p>شوف دقيق وين أنت ضعيف — لفظي ولا كمّي — وركّز وقتك بذكاء.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- DEMO -->
+<section id="demo" style="max-width:1100px;">
+  <div class="label">تجربة حية</div>
+  <h2>جرّب <span style="color:var(--accent)">بنفسك.</span></h2>
+  <div class="demo-wrap">
+    <div class="demo-left">
+      <h3>هكذا تبدو تجربة قُدراتي</h3>
+      <p>اضغط على أي جواب وشوف كيف تشتغل آلية الردود الفورية. بعدها اضغط "التالي" للسؤال الجديد.</p>
+      <div style="margin-top:1.5rem;">
+        <div style="font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--grayD);margin-bottom:0.75rem;">// مميزات مبنية</div>
+        <div style="display:flex;flex-wrap:wrap;gap:0.4rem;">
+          <span class="demo-pill active">✅ Auth System</span>
+          <span class="demo-pill active">✅ Question Feed</span>
+          <span class="demo-pill active">✅ Admin Panel</span>
+          <span class="demo-pill active">✅ Adaptive Engine</span>
+          <span class="demo-pill">🔄 Leaderboard</span>
+          <span class="demo-pill">🔄 Progress Page</span>
+          <span class="demo-pill">⬜ Premium</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-bar">
+        <div class="phone-logo">قُدراتي<span>.</span></div>
+        <div class="phone-streak">🔥 <span>7 يوم</span></div>
+      </div>
+      <div class="phone-prog"><div class="phone-prog-fill"></div></div>
+
+      <div class="phone-card" id="demo-card">
+        <!-- Feedback overlays -->
+        <div class="phone-feedback c-fb" id="correct-fb">
+          <div class="fb-emoji">✅</div>
+          <div class="fb-title">صح! 🔥</div>
+          <div class="fb-exp">مُقتضَب مشتقة من "قضب" وتعني القطع والاختصار. من أكثر الكلمات تكراراً في اللفظي.</div>
+          <button class="fb-next" onclick="nextQ()">التالي ←</button>
+        </div>
+        <div class="phone-feedback w-fb" id="wrong-fb">
+          <div class="fb-emoji">❌</div>
+          <div class="fb-title">خطأ — تقدر أحسن!</div>
+          <div class="fb-exp">الإجابة الصحيحة هي "مختصر وموجز". مُقتضَب تعني القطع والاختصار.</div>
+          <button class="fb-next" onclick="nextQ()">التالي ←</button>
+        </div>
+
+        <div class="phone-tags">
+          <span class="phone-tag sec" id="q-section">لفظي</span>
+          <span class="phone-tag dif" id="q-diff">متوسط</span>
+        </div>
+        <div class="phone-q" id="q-text">ما معنى كلمة "مُقتضَب"؟</div>
+        <div class="phone-opts" id="q-opts">
+          <div class="phone-opt" onclick="ans(this,false)"><span class="phone-letter">أ</span><span>مُطوَّل ومُفصَّل</span></div>
+          <div class="phone-opt" onclick="ans(this,true)"><span class="phone-letter">ب</span><span>مختصر وموجز</span></div>
+          <div class="phone-opt" onclick="ans(this,false)"><span class="phone-letter">ج</span><span>غامض وملتبس</span></div>
+          <div class="phone-opt" onclick="ans(this,false)"><span class="phone-letter">د</span><span>واضح ومبسَّط</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PRICING -->
+<section id="pricing" style="max-width:1100px;">
+  <div class="label">الأسعار</div>
+  <h2>بسيط. <span style="color:var(--accent)">شفاف.</span></h2>
+  <p class="sub">ابدأ مجاناً وارقّي لما تحتاج أكثر.</p>
+  <div class="pricing-grid">
+    <div class="plan">
+      <div class="plan-name">// PLAN_FREE</div>
+      <div class="plan-price">0 <span>SAR/شهر</span></div>
+      <div class="plan-desc">للبدء والتجربة — بدون بطاقة.</div>
+      <div class="plan-features">
+        <div class="plan-feat yes"><span class="check">✓</span> 20 سؤال يومياً</div>
+        <div class="plan-feat yes"><span class="check">✓</span> ستريك يومي</div>
+        <div class="plan-feat yes"><span class="check">✓</span> ليدربورد</div>
+        <div class="plan-feat"><span class="cross">✗</span> محرك تكيّفي</div>
+        <div class="plan-feat"><span class="cross">✗</span> أسئلة غير محدودة</div>
+        <div class="plan-feat"><span class="cross">✗</span> تحليل نقاط الضعف</div>
+      </div>
+      <button class="plan-btn" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})">ابدأ مجاناً</button>
+    </div>
+    <div class="plan featured">
+      <div class="plan-badge">الأشهر</div>
+      <div class="plan-name">// PLAN_PREMIUM</div>
+      <div class="plan-price">19 <span>SAR/شهر</span></div>
+      <div class="plan-desc">كل شي بدون حدود — بسعر وجبة.</div>
+      <div class="plan-features">
+        <div class="plan-feat yes"><span class="check">✓</span> أسئلة غير محدودة</div>
+        <div class="plan-feat yes"><span class="check">✓</span> ستريك يومي</div>
+        <div class="plan-feat yes"><span class="check">✓</span> ليدربورد + شارة مميزة</div>
+        <div class="plan-feat yes"><span class="check">✓</span> محرك تكيّفي كامل</div>
+        <div class="plan-feat yes"><span class="check">✓</span> تحليل نقاط الضعف</div>
+        <div class="plan-feat yes"><span class="check">✓</span> أسئلة جديدة أولاً</div>
+      </div>
+      <button class="plan-btn" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})">ابدأ تجربة 3 أيام مجاناً</button>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- FAQ -->
+<section id="faq" style="max-width:1100px;">
+  <div class="label">أسئلة شائعة</div>
+  <h2>كل شي <span style="color:var(--accent)">واضح.</span></h2>
+  <div class="faq-list">
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">هل التطبيق مجاني؟ <span class="faq-arrow">↓</span></div>
+      <div class="faq-a"><p>نعم — الخطة المجانية تعطيك 20 سؤال يومياً بدون بطاقة بنكية. الخطة المدفوعة بـ 19 ريال فقط وتعطيك أسئلة غير محدودة.</p></div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">هل الأسئلة من اختبارات القدرات الحقيقية؟ <span class="faq-arrow">↓</span></div>
+      <div class="faq-a"><p>نعم — بنك الأسئلة مبني من اختبارات قياس السابقة ويتم تحديثه باستمرار. الهدف إنك تتعرض لأكثر من 1000 سؤال قبل يوم الاختبار.</p></div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">كيف يعمل المحرك التكيّفي؟ <span class="faq-arrow">↓</span></div>
+      <div class="faq-a"><p>كل ما غلطت في سؤال يسجل التطبيق الموضوع ويعطيك أسئلة أكثر منه. مع الوقت التطبيق يعرف نقاط ضعفك أفضل منك ويركز عليها.</p></div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">متى يطلع التطبيق على App Store؟ <span class="faq-arrow">↓</span></div>
+      <div class="faq-a"><p>قريباً — سجّل إيميلك الآن وراح تكون أول واحد يعرف لما يطلع. المبكر يحصل على 3 أشهر بريميوم مجاناً.</p></div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">هل يشمل اللفظي والكمّي؟ <span class="faq-arrow">↓</span></div>
+      <div class="faq-a"><p>نعم — التطبيق يغطي القسمين كاملاً. وتقدر تختار تتدرب على قسم معين أو الاثنين مع بعض.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CTA -->
+<section id="cta">
+  <div class="cta-box">
+    <div class="label" style="justify-content:center;">انضم للقائمة</div>
+    <h2>كن أول من <span style="color:var(--accent)">يجرّبه.</span></h2>
+    <p>سجّل إيميلك الآن واحصل على 3 أشهر بريميوم مجاناً عند الإطلاق.</p>
+    <div class="email-form">
+      <input class="email-input" id="email-input" type="email" placeholder="your@email.com" />
+      <button class="email-btn" onclick="submitEmail()">انضم ←</button>
+    </div>
+    <div class="success-msg" id="success-msg">✅ تم التسجيل! راح نتواصل معك عند الإطلاق.</div>
+    <div class="email-note">// بدون سبام. بدون بطاقة بنكية. فقط إشعار عند الإطلاق.</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">قُدراتي<span>.</span></div>
+    <div class="footer-links">
+      <a href="#features">المميزات</a>
+      <a href="#pricing">الأسعار</a>
+      <a href="#faq">الأسئلة</a>
+    </div>
+    <div class="footer-note">// +300,000 طالب يأخذون القدرات سنوياً</div>
+  </div>
+</footer>
+
+<script>
+// Demo question answering
+let demoAnswered = false;
+const questions = [
+  {section:'لفظي',diff:'متوسط',q:'ما معنى كلمة "مُقتضَب"؟',opts:['مُطوَّل ومُفصَّل','مختصر وموجز','غامض وملتبس','واضح ومبسَّط'],correct:1,exp:'مُقتضَب مشتقة من "قضب" وتعني القطع والاختصار.'},
+  {section:'كمي',diff:'سهل',q:'ما ناتج: 15 × 8 - 40 ÷ 5؟',opts:['108','112','100','96'],correct:1,exp:'15×8=120 و 40÷5=8 إذن 120-8=112'},
+  {section:'لفظي',diff:'سهل',q:'ما ضد كلمة "شُح"؟',opts:['بخل','فقر','كرم','جشع'],correct:2,exp:'ضد الشح هو الكرم والسخاء'},
+  {section:'كمي',diff:'متوسط',q:'إذا كان س + 7 = 15، فما قيمة 3س؟',opts:['21','24','18','27'],correct:1,exp:'س=8 إذن 3×8=24'},
+];
+let qIdx = 0;
+const letters = ['أ','ب','ج','د'];
+
+function ans(el, correct) {
+  if(demoAnswered) return;
+  demoAnswered = true;
+  const opts = document.querySelectorAll('.phone-opt');
+  opts.forEach(o => o.style.pointerEvents='none');
+  if(correct) {
+    el.classList.add('correct');
+    el.querySelector('.phone-letter').style.color='var(--accent)';
+    setTimeout(()=>document.getElementById('correct-fb').classList.add('show'),300);
+  } else {
+    el.classList.add('wrong');
+    el.querySelector('.phone-letter').style.color='var(--coral)';
+    opts[questions[qIdx].correct].classList.add('correct');
+    setTimeout(()=>document.getElementById('wrong-fb').classList.add('show'),300);
+  }
+}
+
+function nextQ() {
+  qIdx = (qIdx+1) % questions.length;
+  const q = questions[qIdx];
+  document.getElementById('correct-fb').classList.remove('show');
+  document.getElementById('wrong-fb').classList.remove('show');
+  document.getElementById('q-section').textContent = q.section;
+  document.getElementById('q-diff').textContent = q.diff;
+  document.getElementById('q-text').textContent = q.q;
+  const optsEl = document.getElementById('q-opts');
+  optsEl.innerHTML = q.opts.map((o,i) =>
+    `<div class="phone-opt" onclick="ans(this,${i===q.correct})">
+      <span class="phone-letter">${letters[i]}</span><span>${o}</span>
+    </div>`
+  ).join('');
+  demoAnswered = false;
+}
+
+// FAQ toggle
+function toggleFaq(el) {
+  const isOpen = el.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(f=>f.classList.remove('open'));
+  if(!isOpen) el.classList.add('open');
+}
+
+// Email submit
+function submitEmail() {
+  const email = document.getElementById('email-input').value;
+  if(!email || !email.includes('@')) return;
+  document.getElementById('email-input').value = '';
+  document.getElementById('success-msg').classList.add('show');
+}
+
+// Smooth scroll for nav
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelector(a.getAttribute('href'))?.scrollIntoView({behavior:'smooth'});
+  });
+});
+</script>
+</body>
+</html>
