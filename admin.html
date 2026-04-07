@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>swipIQ — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#070c13;--card:#101d2e;--border:#162640;--surface:#0c1520;
+  --accent:#0ed2a8;--accentD:#09a882;--white:#eaf6f2;
+  --gray:#7a9eb5;--grayD:#3d607a;--coral:#f04f6a;--amber:#f6a035;--purple:#8b5cf6;
+}
+body{background:var(--bg);color:var(--white);font-family:'Tajawal',sans-serif;min-height:100vh;}
+.grid-bg{position:fixed;inset:0;background-image:linear-gradient(rgba(14,210,168,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(14,210,168,0.03) 1px,transparent 1px);background-size:55px 55px;pointer-events:none;z-index:0;}
+.orb{position:fixed;border-radius:50%;filter:blur(100px);pointer-events:none;z-index:0;}
+.orb1{width:500px;height:500px;background:rgba(14,210,168,0.05);top:-150px;right:-100px;}
+.orb2{width:400px;height:400px;background:rgba(139,92,246,0.04);bottom:-100px;left:-100px;}
+
+/* LOGIN */
+#login-page{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;}
+.login-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:2.5rem;width:100%;max-width:380px;}
+.login-logo{font-family:'Space Mono',monospace;font-size:1.1rem;font-weight:700;margin-bottom:0.25rem;}
+.login-logo span{color:var(--accent);}
+.login-sub{font-family:'Space Mono',monospace;font-size:0.58rem;color:var(--grayD);letter-spacing:0.15em;margin-bottom:2rem;}
+.field{margin-bottom:1rem;}
+.field label{font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--grayD);letter-spacing:0.1em;display:block;margin-bottom:0.4rem;}
+.field input,
+.field select,
+.field textarea{width:100%;padding:0.8rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--white);font-family:'Tajawal',sans-serif;font-size:0.95rem;direction:rtl;transition:border-color 0.2s;outline:none;resize:vertical;}
+.field input[type=email],
+.field input[type=password]{font-family:'Space Mono',monospace;font-size:0.85rem;direction:ltr;text-align:left;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);}
+.btn-accent{width:100%;padding:1rem;background:var(--accent);color:#070c13;border:none;border-radius:8px;font-family:'Tajawal',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:background 0.2s;}
+.btn-accent:hover{background:var(--accentD);}
+.btn-accent:disabled{opacity:0.6;cursor:not-allowed;}
+.err-box{background:rgba(240,79,106,0.1);border:1px solid rgba(240,79,106,0.3);border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem;font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--coral);display:none;}
+.err-box.show{display:block;}
+.ok-box{background:rgba(14,210,168,0.1);border:1px solid rgba(14,210,168,0.3);border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem;font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--accent);display:none;}
+.ok-box.show{display:block;}
+
+/* ADMIN NAV */
+#admin-page{display:none;position:relative;z-index:1;min-height:100vh;}
+.admin-nav{background:rgba(7,12,19,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);height:60px;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.nav-logo{font-family:'Space Mono',monospace;font-size:0.85rem;font-weight:700;}
+.nav-logo span{color:var(--accent);}
+.nav-right{display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;}
+.nav-user{font-family:'Space Mono',monospace;font-size:0.62rem;color:var(--grayD);}
+.logout-btn{font-family:'Space Mono',monospace;font-size:0.62rem;padding:0.35rem 0.8rem;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--gray);cursor:pointer;transition:all 0.2s;}
+.logout-btn:hover{border-color:var(--coral);color:var(--coral);}
+
+/* TABS */
+.content{max-width:860px;margin:0 auto;padding:1.5rem;}
+.tabs{display:flex;gap:0.5rem;margin-bottom:1.5rem;flex-wrap:wrap;}
+.tab-btn{padding:0.6rem 1.25rem;border-radius:8px;border:none;font-family:'Tajawal',sans-serif;font-size:0.95rem;cursor:pointer;font-weight:400;background:var(--card);color:var(--gray);transition:all 0.2s;}
+.tab-btn.active{background:var(--accent);color:#070c13;font-weight:700;}
+
+/* CARDS */
+.panel{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.75rem;display:none;}
+.panel.active{display:block;}
+.label-mono{font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--grayD);letter-spacing:0.1em;margin-bottom:0.4rem;display:block;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
+@media(max-width:600px){.grid-3{grid-template-columns:1fr 1fr;}.grid-2{grid-template-columns:1fr;}}
+
+/* Q list */
+.q-list{display:flex;flex-direction:column;gap:0.5rem;}
+.q-item{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem;display:flex;align-items:flex-start;gap:1rem;transition:background 0.2s;cursor:pointer;}
+.q-item:hover{background:rgba(14,210,168,0.03);}
+.q-tags{display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.35rem;}
+.tag{font-family:'Space Mono',monospace;font-size:0.55rem;padding:0.15rem 0.5rem;border-radius:20px;}
+.tag-sec{border:1px solid var(--accent);color:var(--accent);}
+.tag-dif{border:1px solid var(--border);color:var(--grayD);}
+.tag-id{color:var(--grayD);}
+.tag-img{border:1px solid rgba(56,209,245,0.4);color:#38d1f5;}
+.q-text{font-size:0.9rem;color:var(--white);line-height:1.5;}
+.del-btn{background:transparent;border:none;color:var(--grayD);cursor:pointer;font-size:1rem;transition:color 0.2s;padding:0.2rem;flex-shrink:0;}
+.del-btn:hover{color:var(--coral);}
+.filter-row{display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap;}
+.filter-btn{padding:0.4rem 1rem;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--gray);font-family:'Tajawal',sans-serif;font-size:0.9rem;cursor:pointer;transition:all 0.2s;}
+.filter-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(14,210,168,0.08);}
+
+/* Upload */
+.upload-area{display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;margin-top:0.4rem;}
+.upload-btn{padding:0.7rem 1.25rem;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--gray);font-family:'Space Mono',monospace;font-size:0.7rem;cursor:pointer;transition:all 0.2s;}
+.upload-btn:hover,.upload-btn.done{border-color:var(--accent);color:var(--accent);}
+.upload-btn:disabled{opacity:0.6;cursor:not-allowed;}
+.img-preview-sm{height:52px;width:52px;object-fit:cover;border-radius:8px;border:1px solid var(--border);}
+.img-preview-lg{width:100%;max-height:200px;object-fit:contain;display:block;}
+.img-preview-wrap{margin-top:0.75rem;border-radius:10px;overflow:hidden;border:1px solid var(--border);background:var(--surface);}
+
+/* Stats */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem;}
+@media(max-width:500px){.stats-row{grid-template-columns:1fr 1fr;}}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.25rem;}
+.stat-lbl{font-family:'Space Mono',monospace;font-size:0.58rem;color:var(--grayD);letter-spacing:0.1em;margin-bottom:0.4rem;}
+.stat-val{font-family:'Space Mono',monospace;font-size:2rem;font-weight:700;color:var(--accent);line-height:1;letter-spacing:-0.03em;}
+.stat-sub{font-size:0.75rem;color:var(--grayD);margin-top:0.2rem;}
+
+/* Waitlist table */
+.table-wrap{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.w-table{width:100%;border-collapse:collapse;}
+.w-table th{font-family:'Space Mono',monospace;font-size:0.58rem;color:var(--grayD);letter-spacing:0.1em;padding:0.75rem 1rem;text-align:right;border-bottom:1px solid var(--border);font-weight:400;}
+.w-table th:last-child{text-align:left;}
+.w-table td{padding:0.85rem 1rem;border-bottom:1px solid rgba(22,38,64,0.5);vertical-align:middle;}
+.w-table tr:last-child td{border-bottom:none;}
+.w-table tr:hover td{background:rgba(14,210,168,0.02);}
+.td-email{font-family:'Space Mono',monospace;font-size:0.78rem;color:var(--white);}
+.td-date{font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--grayD);}
+.td-num{font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--grayD);}
+.toolbar{display:flex;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap;}
+.search-inp{flex:1;min-width:180px;padding:0.65rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--white);font-family:'Space Mono',monospace;font-size:0.75rem;direction:ltr;outline:none;transition:border-color 0.2s;}
+.search-inp:focus{border-color:var(--accent);}
+.search-inp::placeholder{color:var(--grayD);}
+.btn-outline{padding:0.65rem 1.25rem;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--gray);font-family:'Space Mono',monospace;font-size:0.65rem;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.btn-outline:hover{border-color:var(--coral);color:var(--coral);}
+.btn-outline-accent{padding:0.65rem 1.25rem;background:transparent;border:1px solid var(--accent);border-radius:8px;color:var(--accent);font-family:'Space Mono',monospace;font-size:0.65rem;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.btn-outline-accent:hover{background:rgba(14,210,168,0.1);}
+
+/* Toast */
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(120px);background:var(--card);border:1px solid var(--accent);border-radius:8px;padding:0.75rem 1.5rem;font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--accent);transition:transform 0.3s;z-index:999;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* Modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:none;align-items:center;justify-content:center;padding:1rem;}
+.modal-bg.show{display:flex;}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:2rem;max-width:420px;width:100%;}
+.modal h3{font-size:1rem;font-weight:700;margin-bottom:0.5rem;}
+.modal p{font-size:0.85rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;}
+.modal-btns{display:flex;gap:0.75rem;}
+.btn-cancel{flex:1;padding:0.75rem;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--gray);font-family:'Tajawal',sans-serif;font-size:0.9rem;cursor:pointer;}
+.btn-danger{flex:1;padding:0.75rem;background:var(--coral);border:none;border-radius:8px;color:white;font-family:'Tajawal',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;}
+
+/* Preview modal */
+.preview-bg{position:fixed;inset:0;background:rgba(7,12,19,0.88);backdrop-filter:blur(8px);z-index:150;display:none;align-items:center;justify-content:center;padding:1.5rem;}
+.preview-bg.show{display:flex;}
+.preview-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.75rem 1.5rem;width:100%;max-width:420px;direction:rtl;font-family:'Tajawal',sans-serif;}
+.p-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;}
+.p-tag-sec{font-family:'Space Mono',monospace;font-size:0.6rem;padding:0.2rem 0.6rem;border:1px solid var(--accent);color:var(--accent);border-radius:20px;}
+.p-tag-dif{font-family:'Space Mono',monospace;font-size:0.6rem;padding:0.2rem 0.6rem;border:1px solid var(--border);color:var(--grayD);border-radius:20px;}
+.p-img-wrap{border-radius:10px;overflow:hidden;border:1px solid var(--border);background:var(--surface);margin-bottom:1.25rem;min-height:160px;position:relative;}
+.p-img-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--grayD);}
+.p-question{font-size:1.1rem;font-weight:500;line-height:1.7;color:var(--white);margin-bottom:1.25rem;}
+.p-opts{display:flex;flex-direction:column;gap:0.5rem;}
+.p-opt{display:flex;align-items:center;gap:0.75rem;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:8px;padding:0.75rem 1rem;cursor:pointer;transition:all 0.2s;}
+.p-opt:hover:not(.answered){border-color:var(--accent);background:rgba(14,210,168,0.05);}
+.p-opt.correct{border-color:var(--accent);background:rgba(14,210,168,0.08);}
+.p-opt.wrong{border-color:var(--coral);background:rgba(240,79,106,0.08);}
+.p-letter{font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--grayD);min-width:18px;text-align:center;}
+.p-opt.correct .p-letter{color:var(--accent);}
+.p-opt.wrong .p-letter{color:var(--coral);}
+.p-explanation{background:rgba(14,210,168,0.06);border:1px solid rgba(14,210,168,0.2);border-radius:8px;padding:0.75rem 1rem;font-size:0.85rem;color:var(--gray);line-height:1.7;margin-top:1rem;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.fade{animation:fadeUp 0.4s ease both;}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="toast" id="toast"></div>
+
+<!-- Confirm Modal -->
+<div class="modal-bg" id="confirm-modal">
+  <div class="modal">
+    <h3 id="modal-title">تأكيد</h3>
+    <p id="modal-msg"></p>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeConfirm()">إلغاء</button>
+      <button class="btn-danger" id="modal-ok">تأكيد</button>
+    </div>
+  </div>
+</div>
+
+<!-- Preview Modal -->
+<div class="preview-bg" id="preview-modal" onclick="closePreview()">
+  <div onclick="event.stopPropagation()">
+    <div style="font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--accent);letter-spacing:0.15em;margin-bottom:0.75rem;text-align:center;">// معاينة — كما يراه الطالب</div>
+    <div class="preview-card" id="preview-card"></div>
+    <button onclick="closePreview()" style="display:block;margin:1rem auto 0;padding:0.6rem 2rem;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--gray);font-family:'Tajawal',sans-serif;font-size:0.9rem;cursor:pointer;">إغلاق</button>
+  </div>
+</div>
+
+<!-- ── LOGIN ── -->
+<div id="login-page">
+  <div class="login-box fade">
+    <div class="login-logo">swipIQ<span>.</span></div>
+    <div class="login-sub">// ADMIN PANEL</div>
+    <div class="err-box" id="login-err"></div>
+    <div class="field">
+      <label>// البريد الإلكتروني</label>
+      <input type="email" id="inp-email" placeholder="admin@email.com" autocomplete="email"/>
+    </div>
+    <div class="field">
+      <label>// كلمة المرور</label>
+      <input type="password" id="inp-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()"/>
+    </div>
+    <button class="btn-accent" id="login-btn" onclick="login()">دخول ←</button>
+  </div>
+</div>
+
+<!-- ── ADMIN ── -->
+<div id="admin-page">
+  <nav class="admin-nav">
+    <div class="nav-logo">swipIQ<span>.</span> <span style="font-size:0.58rem;color:var(--grayD);margin-right:0.5rem;">// ADMIN</span></div>
+    <div class="nav-right">
+      <span class="nav-user" id="nav-user"></span>
+      <button class="logout-btn" onclick="logout()">خروج</button>
+    </div>
+  </nav>
+
+  <div class="content">
+
+    <!-- Tabs -->
+    <div class="tabs fade" style="margin-top:1rem;">
+      <button class="tab-btn active" onclick="switchTab('questions')">📋 الأسئلة</button>
+      <button class="tab-btn" onclick="switchTab('add')">➕ إضافة سؤال</button>
+      <button class="tab-btn" onclick="switchTab('json')">{ } JSON</button>
+      <button class="tab-btn" onclick="switchTab('waitlist')">✉️ قائمة الانتظار</button>
+    </div>
+
+    <!-- ── QUESTIONS TAB ── -->
+    <div class="panel active fade" id="tab-questions">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+        <div style="font-family:'Space Mono',monospace;font-size:0.62rem;color:var(--accent);letter-spacing:0.15em;">// الأسئلة (<span id="q-count">0</span>)</div>
+        <button onclick="fetchQuestions()" style="font-family:'Space Mono',monospace;font-size:0.62rem;padding:0.3rem 0.7rem;background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--grayD);cursor:pointer;">↻ تحديث</button>
+      </div>
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="setFilter('all',this)">الكل</button>
+        <button class="filter-btn" onclick="setFilter('لفظي',this)">لفظي</button>
+        <button class="filter-btn" onclick="setFilter('كمي',this)">كمي</button>
+      </div>
+      <div class="q-list" id="q-list">
+        <div style="text-align:center;padding:3rem;font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--accent);">// تحميل...</div>
+      </div>
+    </div>
+
+    <!-- ── ADD TAB ── -->
+    <div class="panel" id="tab-add">
+      <div class="ok-box" id="add-ok">✅ تم إضافة السؤال بنجاح!</div>
+      <div class="err-box" id="add-err"></div>
+
+      <div class="grid-3">
+        <div class="field">
+          <label class="label-mono">القسم</label>
+          <select id="f-section">
+            <option value="لفظي">لفظي</option>
+            <option value="كمي">كمي</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="label-mono">الصعوبة</label>
+          <select id="f-diff">
+            <option value="easy">سهل</option>
+            <option value="medium">متوسط</option>
+            <option value="hard">صعب</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="label-mono">الإجابة الصحيحة</label>
+          <select id="f-correct">
+            <option value="a">أ</option>
+            <option value="b">ب</option>
+            <option value="c">ج</option>
+            <option value="d">د</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label-mono">الموضوع</label>
+        <input type="text" id="f-topic" placeholder="مثال: معاني الكلمات"/>
+      </div>
+
+      <!-- Image upload -->
+      <div class="field">
+        <label class="label-mono">صورة للسؤال (اختياري)</label>
+        <input type="file" id="img-file" accept="image/*" style="display:none" onchange="uploadImage()"/>
+        <div class="upload-area">
+          <button type="button" class="upload-btn" id="upload-btn" onclick="document.getElementById('img-file').click()">📷 رفع صورة</button>
+          <div id="img-preview-row" style="display:none;align-items:center;gap:0.75rem;">
+            <img id="img-preview-sm" class="img-preview-sm" src="" alt=""/>
+            <button type="button" onclick="removeImage()" style="background:transparent;border:none;color:var(--coral);cursor:pointer;font-family:'Space Mono',monospace;font-size:0.7rem;">✕ حذف</button>
+          </div>
+        </div>
+        <div id="img-preview-wrap" class="img-preview-wrap" style="display:none;margin-top:0.75rem;">
+          <img id="img-preview-lg" class="img-preview-lg" src="" alt=""/>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label-mono">نص السؤال</label>
+        <textarea id="f-question" rows="3" placeholder="اكتب السؤال هنا..."></textarea>
+      </div>
+
+      <div class="grid-2">
+        <div class="field"><label class="label-mono">الخيار أ</label><input type="text" id="f-a" placeholder="الخيار أ"/></div>
+        <div class="field"><label class="label-mono">الخيار ب</label><input type="text" id="f-b" placeholder="الخيار ب"/></div>
+        <div class="field"><label class="label-mono">الخيار ج</label><input type="text" id="f-c" placeholder="الخيار ج"/></div>
+        <div class="field"><label class="label-mono">الخيار د</label><input type="text" id="f-d" placeholder="الخيار د"/></div>
+      </div>
+
+      <div class="field" style="margin-bottom:1.5rem;">
+        <label class="label-mono">الشرح (اختياري)</label>
+        <textarea id="f-explanation" rows="2" placeholder="شرح الإجابة الصحيحة..."></textarea>
+      </div>
+
+      <button class="btn-accent" id="add-btn" onclick="addQuestion()">➕ إضافة السؤال</button>
+    </div>
+
+    <!-- ── JSON TAB ── -->
+    <div class="panel" id="tab-json">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1rem;margin-bottom:1.25rem;">
+        <div style="font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--accent);margin-bottom:0.75rem;letter-spacing:0.1em;">// FORMAT</div>
+        <pre style="font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--gray);line-height:1.8;overflow:auto;margin:0;">[
+  {
+    "section": "لفظي",
+    "topic": "معاني الكلمات",
+    "difficulty": "easy",
+    "question": "ما معنى كلمة ...؟",
+    "option_a": "...",
+    "option_b": "...",
+    "option_c": "...",
+    "option_d": "...",
+    "correct_answer": "b",
+    "explanation": "...",
+    "image_url": null
+  }
+]</pre>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1.25rem;">
+        <span style="font-family:'Space Mono',monospace;font-size:0.58rem;padding:0.2rem 0.6rem;border:1px solid var(--border);color:var(--grayD);border-radius:20px;">section: لفظي أو كمي</span>
+        <span style="font-family:'Space Mono',monospace;font-size:0.58rem;padding:0.2rem 0.6rem;border:1px solid var(--border);color:var(--grayD);border-radius:20px;">difficulty: easy / medium / hard</span>
+        <span style="font-family:'Space Mono',monospace;font-size:0.58rem;padding:0.2rem 0.6rem;border:1px solid var(--border);color:var(--grayD);border-radius:20px;">correct_answer: a / b / c / d</span>
+        <span style="font-family:'Space Mono',monospace;font-size:0.58rem;padding:0.2rem 0.6rem;border:1px solid var(--border);color:var(--grayD);border-radius:20px;">explanation اختياري</span>
+        <span style="font-family:'Space Mono',monospace;font-size:0.58rem;padding:0.2rem 0.6rem;border:1px solid var(--border);color:var(--grayD);border-radius:20px;">image_url اختياري</span>
+      </div>
+
+      <div class="ok-box" id="json-ok"></div>
+      <div class="err-box" id="json-err"></div>
+
+      <div class="field">
+        <label class="label-mono">الصق JSON هنا</label>
+        <textarea id="json-input" rows="14" placeholder='[{"section":"لفظي","topic":"..."}]' style="direction:ltr;text-align:left;font-family:'Space Mono',monospace;font-size:0.75rem;line-height:1.7;"></textarea>
+      </div>
+
+      <div style="display:flex;gap:0.75rem;">
+        <button class="btn-accent" id="json-btn" onclick="importJson()" style="flex:1;">➕ إضافة الأسئلة</button>
+        <button onclick="document.getElementById('json-input').value='';hideMsg('json-ok');hideMsg('json-err');" style="padding:1rem 1.25rem;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--gray);font-family:'Tajawal',sans-serif;font-size:0.95rem;cursor:pointer;">مسح</button>
+      </div>
+    </div>
+
+    <!-- ── WAITLIST TAB ── -->
+    <div class="panel" id="tab-waitlist">
+      <div class="stats-row fade">
+        <div class="stat-card">
+          <div class="stat-lbl">// TOTAL</div>
+          <div class="stat-val" id="w-total">—</div>
+          <div class="stat-sub">إجمالي المسجلين</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-lbl">// TODAY</div>
+          <div class="stat-val" id="w-today">—</div>
+          <div class="stat-sub">مسجل اليوم</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-lbl">// THIS WEEK</div>
+          <div class="stat-val" id="w-week">—</div>
+          <div class="stat-sub">هذا الأسبوع</div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+        <div style="font-family:'Space Mono',monospace;font-size:0.62rem;color:var(--accent);letter-spacing:0.15em;">// قائمة الانتظار</div>
+        <span style="font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--grayD);" id="w-updated"></span>
+      </div>
+
+      <div class="toolbar">
+        <input class="search-inp" id="w-search" type="text" placeholder="search emails..." oninput="filterWaitlist()"/>
+        <button class="btn-outline-accent" onclick="exportCSV()">⬇ Export CSV</button>
+        <button class="btn-outline" onclick="confirmDelAllWaitlist()">🗑 حذف الكل</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="w-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>البريد الإلكتروني</th>
+              <th>تاريخ التسجيل</th>
+              <th style="text-align:left;">حذف</th>
+            </tr>
+          </thead>
+          <tbody id="w-tbody">
+            <tr><td colspan="4" style="text-align:center;padding:3rem;font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--accent);">// تحميل...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL = 'https://rgnzrnavnaxcldnibxjj.supabase.co'
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJnbnpybmF2bmF4Y2xkbmlieGpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyOTgyNTEsImV4cCI6MjA5MDg3NDI1MX0.I4ODkhTSm44TzHv-sewBB_s_H6WjvfzJR-ZnYytoQ1Y'
+
+let authToken = null
+let allQuestions = []
+let allWaitlist = []
+let currentFilter = 'all'
+let deleteQId = null
+let previewSelected = null
+let previewImgLoaded = false
+
+// ── HELPERS ──
+function showToast(msg) {
+  const t = document.getElementById('toast')
+  t.textContent = msg
+  t.classList.add('show')
+  setTimeout(() => t.classList.remove('show'), 3000)
+}
+function showMsg(id, msg) {
+  const el = document.getElementById(id)
+  if (msg) el.textContent = msg
+  el.classList.add('show')
+}
+function hideMsg(id) {
+  document.getElementById(id).classList.remove('show')
+}
+function headers(extra = {}) {
+  return {
+    'apikey': SB_KEY,
+    'Authorization': 'Bearer ' + authToken,
+    'Content-Type': 'application/json',
+    ...extra
+  }
+}
+
+// ── AUTH ──
+async function login() {
+  const email = document.getElementById('inp-email').value.trim()
+  const pass = document.getElementById('inp-pass').value
+  const btn = document.getElementById('login-btn')
+  hideMsg('login-err')
+  btn.textContent = '// جاري الدخول...'
+  btn.disabled = true
+
+  try {
+    const res = await fetch(SB_URL + '/auth/v1/token?grant_type=password', {
+      method: 'POST',
+      headers: { 'apikey': SB_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: pass })
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.error_description || data.msg || 'فشل تسجيل الدخول')
+
+    authToken = data.access_token
+
+    // Check if admin
+    const pRes = await fetch(SB_URL + '/rest/v1/profiles?select=is_admin&id=eq.' + data.user.id, {
+      headers: headers()
+    })
+    const pData = await pRes.json()
+    if (!pData[0]?.is_admin) throw new Error('ليس لديك صلاحية الوصول')
+
+    sessionStorage.setItem('sb_token', authToken)
+    sessionStorage.setItem('sb_email', email)
+    showDashboard(email)
+  } catch(e) {
+    showMsg('login-err', '❌ ' + e.message)
+    btn.textContent = 'دخول ←'
+    btn.disabled = false
+  }
+}
+
+async function logout() {
+  await fetch(SB_URL + '/auth/v1/logout', {
+    method: 'POST',
+    headers: headers()
+  }).catch(() => {})
+  authToken = null
+  sessionStorage.removeItem('sb_token')
+  sessionStorage.removeItem('sb_email')
+  document.getElementById('admin-page').style.display = 'none'
+  document.getElementById('login-page').style.display = 'flex'
+  document.getElementById('inp-email').value = ''
+  document.getElementById('inp-pass').value = ''
+}
+
+function showDashboard(email) {
+  document.getElementById('login-page').style.display = 'none'
+  document.getElementById('admin-page').style.display = 'block'
+  document.getElementById('nav-user').textContent = '// ' + email
+  fetchQuestions()
+  fetchWaitlist()
+}
+
+// Auto-login from session
+window.addEventListener('load', async () => {
+  const t = sessionStorage.getItem('sb_token')
+  const e = sessionStorage.getItem('sb_email')
+  if (t) {
+    authToken = t
+    // Verify token still valid
+    try {
+      const res = await fetch(SB_URL + '/auth/v1/user', {
+        headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + t }
+      })
+      if (res.ok) { showDashboard(e); return }
+    } catch(e) {}
+    sessionStorage.removeItem('sb_token')
+  }
+})
+
+// ── TABS ──
+function switchTab(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'))
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'))
+  document.getElementById('tab-' + name).classList.add('active')
+  event.target.classList.add('active')
+  if (name === 'waitlist') fetchWaitlist()
+}
+
+// ── QUESTIONS ──
+async function fetchQuestions() {
+  document.getElementById('q-list').innerHTML = '<div style="text-align:center;padding:3rem;font-family:\'Space Mono\',monospace;font-size:0.75rem;color:var(--accent);">// تحميل...</div>'
+  const res = await fetch(SB_URL + '/rest/v1/questions?select=*&order=id.desc', { headers: headers() })
+  allQuestions = await res.json()
+  document.getElementById('q-count').textContent = allQuestions.length
+  renderQuestions()
+}
+
+function setFilter(f, btn) {
+  currentFilter = f
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'))
+  btn.classList.add('active')
+  renderQuestions()
+}
+
+function renderQuestions() {
+  const list = currentFilter === 'all' ? allQuestions : allQuestions.filter(q => q.section === currentFilter)
+  if (list.length === 0) {
+    document.getElementById('q-list').innerHTML = '<div style="text-align:center;padding:3rem;font-family:\'Space Mono\',monospace;font-size:0.75rem;color:var(--grayD);">// ما في أسئلة</div>'
+    return
+  }
+  document.getElementById('q-list').innerHTML = list.map(q => `
+    <div class="q-item" onclick="openPreview(${q.id})">
+      ${q.image_url ? `<img src="${q.image_url}" style="width:48px;height:48px;object-fit:cover;border-radius:6px;border:1px solid var(--border);flex-shrink:0;" alt=""/>` : ''}
+      <div style="flex:1;">
+        <div class="q-tags">
+          <span class="tag tag-sec">${q.section}</span>
+          <span class="tag tag-dif">${q.difficulty==='easy'?'سهل':q.difficulty==='medium'?'متوسط':'صعب'}</span>
+          <span class="tag tag-id">#${q.id}</span>
+          <span class="tag tag-id">${q.topic}</span>
+          ${q.image_url ? '<span class="tag tag-img">🖼️</span>' : ''}
+        </div>
+        <div class="q-text">${q.question}</div>
+      </div>
+      <button class="del-btn" onclick="event.stopPropagation();confirmDelQ(${q.id})">🗑️</button>
+    </div>
+  `).join('')
+}
+
+async function deleteQuestion(id) {
+  await fetch(SB_URL + '/rest/v1/questions?id=eq.' + id, {
+    method: 'DELETE', headers: headers()
+  })
+  showToast('✅ تم حذف السؤال')
+  fetchQuestions()
+}
+
+// ── ADD QUESTION ──
+let imageUrl = ''
+
+async function uploadImage() {
+  const file = document.getElementById('img-file').files[0]
+  if (!file) return
+  const btn = document.getElementById('upload-btn')
+  btn.textContent = '// جاري الرفع...'
+  btn.disabled = true
+
+  const fileName = Date.now() + '-' + file.name.replace(/\s/g,'-')
+  const res = await fetch(SB_URL + '/storage/v1/object/question-images/' + fileName, {
+    method: 'POST',
+    headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + authToken, 'Content-Type': file.type, 'x-upsert': 'false' },
+    body: file
+  })
+
+  if (!res.ok) {
+    showToast('❌ فشل رفع الصورة')
+    btn.textContent = '📷 رفع صورة'
+    btn.disabled = false
+    return
+  }
+
+  imageUrl = SB_URL + '/storage/v1/object/public/question-images/' + fileName
+  document.getElementById('img-preview-sm').src = imageUrl
+  document.getElementById('img-preview-lg').src = imageUrl
+  document.getElementById('img-preview-row').style.display = 'flex'
+  document.getElementById('img-preview-wrap').style.display = 'block'
+  btn.textContent = '✅ تم الرفع'
+  btn.classList.add('done')
+  btn.disabled = false
+}
+
+function removeImage() {
+  imageUrl = ''
+  document.getElementById('img-file').value = ''
+  document.getElementById('img-preview-row').style.display = 'none'
+  document.getElementById('img-preview-wrap').style.display = 'none'
+  const btn = document.getElementById('upload-btn')
+  btn.textContent = '📷 رفع صورة'
+  btn.classList.remove('done')
+}
+
+async function addQuestion() {
+  hideMsg('add-ok'); hideMsg('add-err')
+  const q = {
+    section: document.getElementById('f-section').value,
+    topic: document.getElementById('f-topic').value.trim(),
+    difficulty: document.getElementById('f-diff').value,
+    question: document.getElementById('f-question').value.trim(),
+    option_a: document.getElementById('f-a').value.trim(),
+    option_b: document.getElementById('f-b').value.trim(),
+    option_c: document.getElementById('f-c').value.trim(),
+    option_d: document.getElementById('f-d').value.trim(),
+    correct_answer: document.getElementById('f-correct').value,
+    explanation: document.getElementById('f-explanation').value.trim(),
+    image_url: imageUrl || null
+  }
+
+  if (!q.topic || !q.question || !q.option_a || !q.option_b || !q.option_c || !q.option_d) {
+    showMsg('add-err', '❌ املأ كل الحقول!')
+    return
+  }
+
+  const btn = document.getElementById('add-btn')
+  btn.textContent = '// جاري الحفظ...'
+  btn.disabled = true
+
+  const res = await fetch(SB_URL + '/rest/v1/questions', {
+    method: 'POST',
+    headers: headers({ 'Prefer': 'return=minimal' }),
+    body: JSON.stringify(q)
+  })
+
+  if (res.ok || res.status === 201) {
+    showMsg('add-ok', null)
+    ;['f-topic','f-question','f-a','f-b','f-c','f-d','f-explanation'].forEach(id => document.getElementById(id).value = '')
+    removeImage()
+    fetchQuestions()
+    setTimeout(() => hideMsg('add-ok'), 3000)
+  } else {
+    const err = await res.json()
+    showMsg('add-err', '❌ ' + (err.message || 'خطأ'))
+  }
+
+  btn.textContent = '➕ إضافة السؤال'
+  btn.disabled = false
+}
+
+// ── JSON IMPORT ──
+async function importJson() {
+  hideMsg('json-ok'); hideMsg('json-err')
+  const text = document.getElementById('json-input').value.trim()
+  if (!text) return
+
+  const btn = document.getElementById('json-btn')
+  btn.textContent = '// جاري الإضافة...'
+  btn.disabled = true
+
+  try {
+    const parsed = JSON.parse(text)
+    const items = Array.isArray(parsed) ? parsed : [parsed]
+    const required = ['section','topic','difficulty','question','option_a','option_b','option_c','option_d','correct_answer']
+    for (let i = 0; i < items.length; i++) {
+      for (const f of required) {
+        if (!items[i][f]) {
+          showMsg('json-err', `❌ السؤال ${i+1}: الحقل "${f}" مفقود`)
+          btn.textContent = '➕ إضافة الأسئلة'
+          btn.disabled = false
+          return
+        }
+      }
+    }
+    const res = await fetch(SB_URL + '/rest/v1/questions', {
+      method: 'POST',
+      headers: headers({ 'Prefer': 'return=minimal' }),
+      body: JSON.stringify(items)
+    })
+    if (res.ok || res.status === 201) {
+      showMsg('json-ok', `✅ تم إضافة ${items.length} سؤال بنجاح!`)
+      document.getElementById('json-input').value = ''
+      fetchQuestions()
+    } else {
+      const err = await res.json()
+      showMsg('json-err', '❌ ' + (err.message || 'خطأ في الإضافة'))
+    }
+  } catch(e) {
+    showMsg('json-err', '❌ JSON غير صحيح — تحقق من الصياغة')
+  }
+
+  btn.textContent = '➕ إضافة الأسئلة'
+  btn.disabled = false
+}
+
+// ── PREVIEW ──
+function openPreview(id) {
+  const q = allQuestions.find(x => x.id === id)
+  if (!q) return
+  previewSelected = null
+  previewImgLoaded = false
+  const opts = [
+    {letter:'أ',key:'a',text:q.option_a},
+    {letter:'ب',key:'b',text:q.option_b},
+    {letter:'ج',key:'c',text:q.option_c},
+    {letter:'د',key:'d',text:q.option_d},
+  ]
+  document.getElementById('preview-card').innerHTML = `
+    <div class="p-header">
+      <span class="p-tag-sec">${q.section}</span>
+      <div style="display:flex;gap:0.5rem;align-items:center;">
+        ${q.image_url ? '<span style="font-family:\'Space Mono\',monospace;font-size:0.55rem;padding:0.15rem 0.5rem;border:1px solid rgba(56,209,245,0.4);color:#38d1f5;border-radius:20px;">🖼️ صورة</span>' : ''}
+        <span class="p-tag-dif">${q.difficulty==='easy'?'سهل':q.difficulty==='medium'?'متوسط':'صعب'}</span>
+      </div>
+    </div>
+    ${q.image_url ? `
+      <div class="p-img-wrap">
+        <div class="p-img-loading" id="p-img-loading">// تحميل الصورة...</div>
+        <img src="${q.image_url}" alt="" onload="document.getElementById('p-img-loading').style.display='none';this.style.display='block'" style="width:100%;max-height:220px;object-fit:contain;display:none;"/>
+      </div>` : ''}
+    <div class="p-question">${q.question}</div>
+    <div class="p-opts" id="p-opts">
+      ${opts.map(o => `
+        <div class="p-opt" id="popt-${o.key}" onclick="selectPreview('${o.key}','${q.correct_answer}','${q.explanation?.replace(/'/g,"\\'")||''}')">
+          <span class="p-letter">${o.letter}</span>
+          <span style="font-size:0.95rem;color:var(--white);flex:1;">${o.text}</span>
+        </div>
+      `).join('')}
+    </div>
+    <div id="p-explanation" style="display:none;" class="p-explanation">💡 ${q.explanation||''}</div>
+  `
+  document.getElementById('preview-modal').classList.add('show')
+}
+
+function selectPreview(key, correct, explanation) {
+  if (previewSelected) return
+  previewSelected = key
+  const opts = document.querySelectorAll('.p-opt')
+  opts.forEach(o => o.onclick = null)
+  document.getElementById('popt-' + correct).classList.add('correct')
+  document.getElementById('popt-' + correct).querySelector('.p-letter').style.color = 'var(--accent)'
+  if (key !== correct) {
+    document.getElementById('popt-' + key).classList.add('wrong')
+    document.getElementById('popt-' + key).querySelector('.p-letter').style.color = 'var(--coral)'
+  }
+  if (explanation) document.getElementById('p-explanation').style.display = 'block'
+}
+
+function closePreview() {
+  document.getElementById('preview-modal').classList.remove('show')
+  previewSelected = null
+}
+
+// ── WAITLIST ──
+async function fetchWaitlist() {
+  const res = await fetch(SB_URL + '/rest/v1/waitlist?select=*&order=created_at.desc', { headers: headers() })
+  allWaitlist = await res.json()
+  renderWaitlist(allWaitlist)
+  updateWaitlistStats(allWaitlist)
+  document.getElementById('w-updated').textContent = '// updated ' + new Date().toLocaleTimeString()
+}
+
+function updateWaitlistStats(data) {
+  document.getElementById('w-total').textContent = data.length
+  const today = new Date().toDateString()
+  document.getElementById('w-today').textContent = data.filter(r => new Date(r.created_at).toDateString() === today).length
+  const weekAgo = new Date(Date.now() - 7*24*60*60*1000)
+  document.getElementById('w-week').textContent = data.filter(r => new Date(r.created_at) > weekAgo).length
+}
+
+function renderWaitlist(data) {
+  if (data.length === 0) {
+    document.getElementById('w-tbody').innerHTML = '<tr><td colspan="4" style="text-align:center;padding:3rem;font-family:\'Space Mono\',monospace;font-size:0.75rem;color:var(--grayD);">// ما في مسجلين بعد 📭</td></tr>'
+    return
+  }
+  document.getElementById('w-tbody').innerHTML = data.map((r,i) => `
+    <tr>
+      <td><span class="td-num">${i+1}</span></td>
+      <td><span class="td-email">${r.email}</span></td>
+      <td><span class="td-date">${formatDate(r.created_at)}</span></td>
+      <td style="text-align:left;"><button class="del-btn" onclick="confirmDelWaitlist(${r.id},'${r.email}')">🗑️</button></td>
+    </tr>
+  `).join('')
+}
+
+function filterWaitlist() {
+  const q = document.getElementById('w-search').value.toLowerCase()
+  renderWaitlist(allWaitlist.filter(r => r.email.toLowerCase().includes(q)))
+}
+
+async function deleteWaitlist(id) {
+  await fetch(SB_URL + '/rest/v1/waitlist?id=eq.' + id, { method:'DELETE', headers: headers() })
+  showToast('✅ تم الحذف')
+  fetchWaitlist()
+}
+
+async function deleteAllWaitlist() {
+  await fetch(SB_URL + '/rest/v1/waitlist?id=gt.0', { method:'DELETE', headers: headers() })
+  showToast('✅ تم حذف الكل')
+  fetchWaitlist()
+}
+
+function exportCSV() {
+  if (!allWaitlist.length) { showToast('⚠️ ما في بيانات'); return }
+  const csv = 'Email,Date\n' + allWaitlist.map(r => `${r.email},${new Date(r.created_at).toISOString()}`).join('\n')
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'}))
+  a.download = 'swipiq-waitlist-' + new Date().toISOString().split('T')[0] + '.csv'
+  a.click()
+  showToast('✅ تم التصدير — ' + allWaitlist.length + ' إيميل')
+}
+
+function formatDate(str) {
+  const d = new Date(str)
+  return d.toLocaleDateString('ar-SA') + ' ' + d.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'})
+}
+
+// ── CONFIRM MODAL ──
+function confirmDelQ(id) {
+  document.getElementById('modal-title').textContent = 'حذف السؤال'
+  document.getElementById('modal-msg').textContent = `هل تريد حذف السؤال #${id}؟`
+  document.getElementById('modal-ok').onclick = () => { closeConfirm(); deleteQuestion(id) }
+  document.getElementById('confirm-modal').classList.add('show')
+}
+
+function confirmDelWaitlist(id, email) {
+  document.getElementById('modal-title').textContent = 'حذف الإيميل'
+  document.getElementById('modal-msg').textContent = `هل تريد حذف "${email}"؟`
+  document.getElementById('modal-ok').onclick = () => { closeConfirm(); deleteWaitlist(id) }
+  document.getElementById('confirm-modal').classList.add('show')
+}
+
+function confirmDelAllWaitlist() {
+  document.getElementById('modal-title').textContent = 'حذف الكل'
+  document.getElementById('modal-msg').textContent = `هل تريد حذف جميع الإيميلات (${allWaitlist.length})؟ لا يمكن التراجع.`
+  document.getElementById('modal-ok').onclick = () => { closeConfirm(); deleteAllWaitlist() }
+  document.getElementById('confirm-modal').classList.add('show')
+}
+
+function closeConfirm() {
+  document.getElementById('confirm-modal').classList.remove('show')
+}
+
+// Auto refresh waitlist every 60s
+setInterval(() => {
+  if (authToken && document.getElementById('tab-waitlist').classList.contains('active')) fetchWaitlist()
+}, 60000)
+</script>
+</body>
+</html>
